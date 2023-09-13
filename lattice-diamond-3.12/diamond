@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source "${bindir}"/diamond_env
+"${bindir}"/diamond "$@"

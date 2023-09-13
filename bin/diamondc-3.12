@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if ! podman images | grep -q "lattice-diamond-3.12"; then
+    echo "This image is not yet set up"
+    exit 1
+fi
+
+toolbox run --container lattice-diamond-3.12 diamondc "$@"

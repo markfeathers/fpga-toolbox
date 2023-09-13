@@ -1,0 +1,43 @@
+FROM registry.access.redhat.com/ubi7:7.9
+
+LABEL com.github.containers.toolbox="true" \
+      com.redhat.component="$NAME" \
+      com.redhat.license_terms="https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI" \
+      name="$NAME" \
+      version="$VERSION" \
+      usage="This image is meant to be used with the toolbox command" \
+      summary="Base image for creating UBI toolbox containers" \
+      maintainer="Oliver Gutiérrez <ogutierrez@redhat.com>"
+
+COPY extra-packages /
+RUN yum -y install $(<extra-packages)
+RUN rm /extra-packages
+
+CMD /bin/sh
+
+# UBI8 doesn't seem to have vte-profile
+run rpm -i http://mirror.centos.org/centos/7/os/x86_64/Packages/vte-profile-0.52.4-1.el7.x86_64.rpm
+
+# It seems UBI-8 doesn't include libusb packages? We can grab these from centos anyway
+RUN rpm -i http://mirror.centos.org/centos/7/os/x86_64/Packages/libusbx-1.0.21-1.el7.x86_64.rpm
+RUN rpm -i http://mirror.centos.org/centos/7/os/x86_64/Packages/libusb-0.1.4-3.el7.x86_64.rpm
+
+COPY diamond_3_12-base-240-2-x86_64-linux.rpm /diamond_3_12-base-240-2-x86_64-linux.rpm
+RUN rpm -i /diamond_3_12-base-240-2-x86_64-linux.rpm && rm /diamond_3_12-base-240-2-x86_64-linux.rpm
+
+COPY diamond_3_12-sp1-454-2-x86_64-linux.rpm /diamond_3_12-sp1-454-2-x86_64-linux.rpm
+RUN rpm -i /diamond_3_12-sp1-454-2-x86_64-linux.rpm && rm /diamond_3_12-sp1-454-2-x86_64-linux.rpm
+
+ENV DIAMOND_DIR=/usr/local/diamond/3.12
+ENV bindir=$DIAMOND_DIR/bin/lin64
+ENV QT_GRAPHICSSYSTEM=native
+ENV LM_LICENSE_FILE=$HOME/.license.dat
+
+COPY ./diamond /usr/local/bin/diamond
+RUN chmod a+x /usr/local/bin/diamond
+
+COPY ./diamondc /usr/local/bin/diamondc
+RUN chmod a+x /usr/local/bin/diamondc
+
+COPY ./programmer /usr/local/bin/programmer
+RUN chmod a+x /usr/local/bin/programmer
