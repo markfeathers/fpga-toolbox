@@ -5,4 +5,4 @@ if ! podman images | grep -q "lattice-diamond-3.12"; then
     exit 1
 fi
 
-toolbox run --container lattice-diamond-3.12 diamondc "$@"
+toolbox run --container lattice-diamond-3.12 diamond "$@"
